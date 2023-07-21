@@ -5,7 +5,9 @@ import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-
+import GroupIcon from "@mui/icons-material/Group";
+import StoreIcon from "@mui/icons-material/Store";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import MailIcon from "@mui/icons-material/Mail";
 import SideBarItem from "../../components/SideBarItem";
 import { ROUTES } from "../../routes";
@@ -27,9 +29,9 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `100px`,
+  width: `112px`,
   [theme.breakpoints.up("sm")]: {
-    width: `100px`,
+    width: `112px`,
   },
 });
 
@@ -64,11 +66,9 @@ const SideBar = () => {
         <Divider />
         <List>
           <SideBarItem open={open} path={ROUTES.Dashboard} text={"Dashboard"} icon={<MailIcon />} />
-          <SideBarItem open={open} path={ROUTES.Products} text={"Products"} icon={<MailIcon />} />
-          <SideBarItem open={open} path={ROUTES.Dashboard} text={"Drafts"} icon={<MailIcon />} />
-          <SideBarItem open={open} path={ROUTES.Dashboard} text={"Drafts"} icon={<MailIcon />} />
-          <SideBarItem open={open} path={ROUTES.Dashboard} text={"Drafts"} icon={<MailIcon />} />
-          <SideBarItem open={open} path="/1" text={"Drafts"} icon={<MailIcon />} />
+          <SideBarItem open={open} path={ROUTES.Custumers} text={"Customers"} icon={<GroupIcon />} />
+          <SideBarItem open={open} path={ROUTES.Products} text={"Products"} icon={<StoreIcon />} />
+          <SideBarItem open={open} path={ROUTES.Orders} text={"Orders"} icon={<BusinessCenterIcon />} />
         </List>
         <Divider />
       </Drawer>
