@@ -8,12 +8,12 @@ const useAddProduct = () => {
     const AddProductSchema = yup.object({
         name: yup.string(),
         price: yup.number(),
+        count: yup.number(),
         category: yup.string(),
         weight: yup.string(),
         dimentions: yup.string(),
         colors: yup.string(),
         material: yup.string(),
-        count: yup.number(),
         description: yup.string(),
     })
     const { register, handleSubmit,formState: { errors } } = useForm<any>({
