@@ -7,20 +7,32 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-
+import { useCallback, useEffect, useState } from "react";
+import { GetProductsService } from "../../api/services/product";
+import { Link } from "react-router-dom";
+import EditProductModal from "../EditProductModal";
+// interface Column {
+//   id: "name" | "img" | "price" | "count" | "edit";
+//   label: string;
+//   minWidth?: number;
+//   align?: "right";
+// }
 interface Column {
-  id: "name" | "img" | "price" | "count" | "edit";
+  id: "name" | "price" | "count" | "category";
   label: string;
   minWidth?: number;
   align?: "right";
 }
-
 const columns: Column[] = [
-    { id: "img", label: "img", minWidth: 170 },
-    { id: "name", label: "Name", minWidth: 170 },
+  { id: "name", label: "Name", minWidth: 170 },
   {
     id: "price",
     label: "price",
+    minWidth: 170,
+  },
+  {
+    id: "category",
+    label: "category",
     minWidth: 170,
   },
   {
@@ -28,51 +40,21 @@ const columns: Column[] = [
     label: "count",
     minWidth: 170,
   },
-  {
-    id: "edit",
-    label: "edit",
-    minWidth: 170,
-  },
 ];
 
-interface Data {
-  name: string;
-  img: string;
-  price: number;
-  count: number;
-  edit: string;
-}
-
-function createData(
-  name: string,
-  img: string,
-  price: number,
-  count: number,
-  edit:string
-): Data {
-  return { name, img, price, count, edit };
-}
-
-const rows = [
-  createData("India", "IN", 1324171354, 3287263 , 'edit'),
-  createData("China", "CN", 1403500365, 9596961 , 'edit'),
-  createData("Italy", "IT", 60483973, 301340 , 'edit'),
-  createData("United States", "US", 327167434, 9833520 , 'edit'),
-  createData("Canada", "CA", 37602103, 9984670 , 'edit'),
-  createData("Australia", "AU", 25475400, 7692024 , 'edit'),
-  createData("Germany", "DE", 83019200, 357578 , 'edit'),
-  createData("Ireland", "IE", 4857000, 70273 , 'edit'),
-  createData("Mexico", "MX", 126577691, 1972550 , 'edit'),
-  createData("Japan", "JP", 126317000, 377973 , 'edit'),
-  createData("France", "FR", 67022000, 640679 , 'edit'),
-  createData("United Kingdom", "GB", 67545757, 242495 , 'edit'),
-  createData("Russia", "RU", 146793744, 17098246 , 'edit'),
-  createData("Nigeria", "NG", 200962417, 923768 , 'edit'),
-  createData("Brazil", "BR", 210147125, 8515767 , 'edit'),
-];
 const ProductTable = () => {
+  const [productsList, setProductsList] = useState<[]>([]);
+  const fetchProductsList = useCallback(async () => {
+    const res = await GetProductsService();
+    setProductsList(res.data);
+  }, []);
+  useEffect(() => {
+    fetchProductsList();
+  }, []);
+  console.log(productsList);
+
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(8);
+  const [rowsPerPage, setRowsPerPage] = React.useState(4);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -87,9 +69,10 @@ const ProductTable = () => {
 
   return (
     <Paper sx={{ width: "100%" }}>
-      <TableContainer sx={{ height: 500 }}>
+      <TableContainer sx={{ height: 504 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableRow>
+            <TableCell style={{ top: 57, minWidth: 170 }}>{"img"}</TableCell>
             {columns.map((column) => (
               <TableCell
                 key={column.id}
@@ -98,13 +81,24 @@ const ProductTable = () => {
                 {column.label}
               </TableCell>
             ))}
+            <TableCell key={"1"} style={{ top: 57, minWidth: 170 }}>
+              {"edit"}
+              {/* {column.label} */}
+            </TableCell>
           </TableRow>
           <TableBody>
-            {rows
+            {productsList
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
+              .map((row: any) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.img}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                    <TableCell>
+                      <img
+                        className="h-20 w-20"
+                        src={`http://localhost:3000${row.img}`}
+                        alt=""
+                      />
+                    </TableCell>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
@@ -113,6 +107,16 @@ const ProductTable = () => {
                         </TableCell>
                       );
                     })}
+                    <TableCell>
+                      <EditProductModal
+                        img={`http://localhost:3000${row.img}`}
+                        id={row._id}
+                        onSubmit={fetchProductsList}
+                        name={row.name}
+                        price={row.price}
+                        count={row.count}
+                      />
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -120,9 +124,9 @@ const ProductTable = () => {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[8, 16, 24]}
+        rowsPerPageOptions={[4, 8, 16, 24]}
         component="div"
-        count={rows.length}
+        count={productsList.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
