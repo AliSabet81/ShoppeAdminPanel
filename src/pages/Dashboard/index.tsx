@@ -9,7 +9,7 @@ const Dashboard = () => {
   return (
     <div className="w-full h-screen flex flex-col gap-10 p-20 bg-gray-50">
       <div>
-        <h1 className="text-3xl">Hello Evano 👋🏼,</h1>
+        <h1 className="text-3xl">Hello ALI 👋🏼,</h1>
       </div>
       <div className="grid grid-cols-4 gap-10 bg-white py-8 px-12 rounded-xl">
         <DashboardItem title={"Customers"} class="bg-sky-300" count={"123"} icon={<GroupIcon sx={{ fontSize: 40 }} />} borderR={true}/>

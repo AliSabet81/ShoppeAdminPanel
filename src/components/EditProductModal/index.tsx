@@ -4,14 +4,12 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import { TextField } from "@mui/material";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
-  GetSingleProductService,
-  UpdateProducService,
+  UpdateProductService,
 } from "../../api/services/product";
 interface IEditModal {
   id: string;
@@ -41,18 +39,18 @@ const EditProductModal = (i: IEditModal) => {
   const { register, handleSubmit, reset } = useForm<any>({
     resolver: yupResolver(EditProductSchema),
   });
-  React.useEffect(() => {
-    reset({ name: i.name, price: i.price, count: i.count });
-  }, []);
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {
+    reset({ name: i.name, price: i.price, count: i.count });
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
-  const handleEditProduct = React.useCallback(async (data) => {
+  const handleEditProduct = React.useCallback(async (data: { name: string | Blob; price: string | Blob; count: string | Blob; }) => {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("price", data.price);
     formData.append("count", data.count);
-    await UpdateProducService(i.id, formData);
+    await UpdateProductService(i.id, formData);
     i.onSubmit();
     setOpen(false);
   }, []);

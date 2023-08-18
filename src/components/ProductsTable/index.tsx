@@ -4,19 +4,12 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { useCallback, useEffect, useState } from "react";
-import { GetProductsService } from "../../api/services/product";
-import { Link } from "react-router-dom";
+import { DeleteProductService, GetProductsService } from "../../api/services/product";
 import EditProductModal from "../EditProductModal";
-// interface Column {
-//   id: "name" | "img" | "price" | "count" | "edit";
-//   label: string;
-//   minWidth?: number;
-//   align?: "right";
-// }
+import { Button } from "@mui/material";
 interface Column {
   id: "name" | "price" | "count" | "category";
   label: string;
@@ -43,20 +36,18 @@ const columns: Column[] = [
 ];
 
 const ProductTable = () => {
-  const [productsList, setProductsList] = useState<[]>([]);
-  const fetchProductsList = useCallback(async () => {
-    const res = await GetProductsService();
-    setProductsList(res.data);
-  }, []);
-  useEffect(() => {
-    fetchProductsList();
-  }, []);
-  console.log(productsList);
-
+  const [productsList, setProductsList] = useState<[]>([]);  
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(4);
+  const fetchProductsList = useCallback(async () => {
+    const res = await GetProductsService({pageNumber:page+1,pageSize:rowsPerPage});
+    setProductsList(res.data);
+  }, [rowsPerPage,page]);
+  useEffect(() => {
+    fetchProductsList();
+  }, [rowsPerPage,page]);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -64,9 +55,11 @@ const ProductTable = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setRowsPerPage(+event.target.value);
-    setPage(0);
   };
-
+  const handleDelete = async (id: string) => {
+    await DeleteProductService(id);
+    fetchProductsList();
+  };
   return (
     <Paper sx={{ width: "100%" }}>
       <TableContainer sx={{ height: 504 }}>
@@ -88,14 +81,13 @@ const ProductTable = () => {
           </TableRow>
           <TableBody>
             {productsList
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row: any) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     <TableCell>
                       <img
                         className="h-20 w-20"
-                        src={`http://localhost:3000${row.img}`}
+                        src={`http://localhost:3333${row.img}`}
                         alt=""
                       />
                     </TableCell>
@@ -109,13 +101,14 @@ const ProductTable = () => {
                     })}
                     <TableCell>
                       <EditProductModal
-                        img={`http://localhost:3000${row.img}`}
+                        img={`http://localhost:3333${row.img}`}
                         id={row._id}
                         onSubmit={fetchProductsList}
                         name={row.name}
                         price={row.price}
                         count={row.count}
                       />
+                      <Button onClick={()=>handleDelete(row._id)}>delete</Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -126,7 +119,7 @@ const ProductTable = () => {
       <TablePagination
         rowsPerPageOptions={[4, 8, 16, 24]}
         component="div"
-        count={productsList.length}
+        count={100}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

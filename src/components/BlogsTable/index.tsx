@@ -7,50 +7,47 @@ import TableContainer from "@mui/material/TableContainer";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { useCallback, useEffect, useState } from "react";
-import { DeleteUserService, GetUsersService } from "../../api/services/users";
 import { Button } from "@mui/material";
+import { DeleteBlogService, GetBlogsService } from "../../api/services/blog";
 interface Column {
-  id: "firstname" | "lastname" | "email" | "_id";
+  id: "title" | "author" | "category" | "date";
   label: string;
   minWidth?: number;
   align?: "right";
 }
 const columns: Column[] = [
-  { id: "firstname", label: "firstname", minWidth: 170 },
+  { id: "title", label: "title", minWidth: 170 },
   {
-    id: "lastname",
-    label: "lastname",
+    id: "author",
+    label: "author",
     minWidth: 170,
   },
   {
-    id: "email",
-    label: "email",
+    id: "category",
+    label: "category",
     minWidth: 170,
   },
   {
-    id: "_id",
-    label: "id",
+    id: "date",
+    label: "date",
     minWidth: 170,
   },
 ];
 
-const ProductTable = () => {
-  const [UsersLists, setUsersLists] = useState<[]>([]);
-
-  const fetchUsersList = useCallback(async () => {
-    const res = await GetUsersService();
-    setUsersLists(res.data);
-  }, []);
-  useEffect(() => {
-    fetchUsersList();
-  }, []);
-  console.log(UsersLists);
-  const handleDelete = async (id: string) => {
-    await DeleteUserService(id)
-    fetchUsersList();
-  };
+const BlogsTable = () => {
+  const [blogs, setBlogsList] = useState<[]>([]);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(6);
+  const [rowsPerPage, setRowsPerPage] = React.useState(4);
+  const fetchBlogsList = useCallback(async () => {
+    const res = await GetBlogsService({
+      pageNumber: page + 1,
+      pageSize: rowsPerPage,
+    });
+    setBlogsList(res.data);
+  }, [rowsPerPage, page]);
+  useEffect(() => {
+    fetchBlogsList();
+  }, [rowsPerPage, page]);
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
@@ -60,14 +57,17 @@ const ProductTable = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setRowsPerPage(+event.target.value);
-    setPage(0);
   };
-
+  const handleDelete = async (id: string) => {
+    await DeleteBlogService(id);
+    fetchBlogsList();
+  };
   return (
     <Paper sx={{ width: "100%" }}>
-      <TableContainer sx={{ height: 470 }}>
+      <TableContainer sx={{ height: 504 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableRow>
+            <TableCell style={{ top: 57, minWidth: 170 }}>{"img"}</TableCell>
             {columns.map((column) => (
               <TableCell
                 key={column.id}
@@ -76,15 +76,21 @@ const ProductTable = () => {
                 {column.label}
               </TableCell>
             ))}
-            <TableCell style={{ top: 57, minWidth: 170 }}>{"delete"}</TableCell>
+            <TableCell key={"1"} style={{ top: 57, minWidth: 170 }}>
+              {"edit"}
+            </TableCell>
           </TableRow>
           <TableBody>
-            {UsersLists.slice(
-              page * rowsPerPage,
-              page * rowsPerPage + rowsPerPage
-            ).map((row: any) => {
+            {blogs.map((row: any) => {
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                  <TableCell>
+                    <img
+                      className="h-20 w-20"
+                      src={`http://localhost:3333${row.img}`}
+                      alt=""
+                    />
+                  </TableCell>
                   {columns.map((column) => {
                     const value = row[column.id];
                     return (
@@ -105,9 +111,9 @@ const ProductTable = () => {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[6, 12, 18, 24]}
+        rowsPerPageOptions={[4, 8, 16, 24]}
         component="div"
-        count={UsersLists.length}
+        count={100}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -117,4 +123,4 @@ const ProductTable = () => {
   );
 };
 
-export default ProductTable;
+export default BlogsTable;
